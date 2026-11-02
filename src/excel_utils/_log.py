@@ -13,6 +13,11 @@ PREFIJO_LOG_PREDETERMINADO = "excel_utils-"
 NIVEL_LOG_PREDETERMINADO = "INFO"
 MAX_LOGS_PREDETERMINADO = 30
 
+FORMATO_MANEJADOR_ARCHIVO = logging.Formatter(
+    "%(asctime)s %(levelname)s %(name)s: %(message)s"
+)
+FORMATO_MANEJADOR_CONSOLA = logging.Formatter("%(message)s")
+
 
 def carpeta_logs() -> Path:
     """Carpeta logs/ en la raiz del proyecto (solo desarrollo: tests)."""
@@ -59,9 +64,8 @@ def configurar_log(
 
     manejador_archivo = logging.FileHandler(archivo_log, encoding="utf-8")
     manejador_consola = logging.StreamHandler()
-    formato = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
-    manejador_archivo.setFormatter(formato)
-    manejador_consola.setFormatter(formato)
+    manejador_archivo.setFormatter(FORMATO_MANEJADOR_ARCHIVO)
+    manejador_consola.setFormatter(FORMATO_MANEJADOR_CONSOLA)
     logger.addHandler(manejador_archivo)
     logger.addHandler(manejador_consola)
     logger.setLevel(resuelto)

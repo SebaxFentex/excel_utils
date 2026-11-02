@@ -1,4 +1,4 @@
-# AGENTS.md — excel
+# AGENTS.md — excel_utils
 
 Guia para agentes (y humanos) que trabajan en este repo. Cada regla con su
 "porque" viene de un defecto real; no relajarla sin evidencia nueva.
@@ -19,7 +19,7 @@ Linux/macOS el import carga pero `abrir()` no puede funcionar.
 Stack: Python 3.14, `uv`, `xlwings==0.37.8`.
 
 ```text
-src/excel/
+src/excel_utils/
   __init__.py        NullHandler + API publica (sin re-exports de modulos internos)
   _log.py            configurar_log() + purgar_logs() — solo para desarrollo
   _excepciones.py    ExcepcionExcel (1), ExcepcionTablaNoEncontrada (2),
@@ -29,12 +29,14 @@ src/excel/
 ejecutables/
   build.bat          uv build y lista dist/
   abrir_vscode.bat   abre la raiz de la libreria
+  tests/             un .bat por test (espejo de tests/)
+tests/               los tres tests; el unico lugar del ecosistema con tests
 logs/                logs de desarrollo (ignorado por git)
 ```
 
 ## 2. Arquitectura y API
 
-- **La libreria no lee entorno.** `import excel` no exige ninguna variable y no
+- **La libreria no lee entorno.** `import excel_utils` no exige ninguna variable y no
   abre Excel. Todo entra por parametro: la ruta del libro, `visible` y los
   nombres de tabla/consulta. La unica lectura de entorno es
   `EXCEL_NIVEL_LOG` dentro de `_log.py`, que es desarrollo.
@@ -66,7 +68,7 @@ logs/                logs de desarrollo (ignorado por git)
    en cada modulo y `NullHandler` en el paquete; `configurar_log()` solo se
    llama desde desarrollo. Prohibido `basicConfig()` y prohibido que un modulo
    que emite agregue manejadores: el unico que agrega es
-   `_log.configurar_log()`, y lo hace sobre el logger "excel", nunca sobre el
+   `_log.configurar_log()`, y lo hace sobre el logger "excel_utils", nunca sobre el
    raiz del consumidor.
 4. **Sin `print()`.** El unico destino de las trazas es `log`.
 5. **Sin efectos al importar.** Prohibido abrir Excel a nivel de modulo y
@@ -93,7 +95,7 @@ logs/                logs de desarrollo (ignorado por git)
 ## 4. Logging, codigos de salida y `.env`
 
 - `configurar_log(nivel=None, prefijo="excel_utils-", conservar=30)` configura el
-  logger "excel" (no el raiz) con archivo y consola en `logs/` (utf-8), purga
+  logger "excel_utils" (no el raiz) con archivo y consola en `logs/` (utf-8), purga
   los antiguos y es idempotente: la segunda llamada no agrega manejadores.
   Nivel por parametro > `EXCEL_NIVEL_LOG` > INFO; un valor invalido cae a INFO.
   Devuelve el `Logger` configurado.
@@ -106,16 +108,16 @@ logs/                logs de desarrollo (ignorado por git)
 
 ## 5. Verificacion antes de dar por hecho
 
-1. `uv run python -m compileall -q src/excel`.
-2. `import excel` con el entorno vacio: sin error, `handlers` con el `NullHandler`
+1. `uv run python -m compileall -q src/excel_utils`.
+2. `import excel_utils` con el entorno vacio: sin error, `handlers` con el `NullHandler`
    y sin instancia de Excel creada.
-3. `ty check src/excel tests` y `ruff check src tests` + `ruff format --check`
+3. `ty check src/excel_utils tests` y `ruff check src tests` + `ruff format --check`
    en verde (los `noqa: BLE001` llevan su razon: COM de Excel lanza
    `com_error` donde un hasattr/None no alcanza; el aviso
    `reportOptionalMemberAccess` del editor no lo ve el CLI: da
    `All checks passed!`).
 4. `uv build` sin advertencias de `build_system.requires`; el wheel debe traer
-   `excel/__init__.py`.
+   `excel_utils/__init__.py`.
 5. Greps de guardia: cero `getenv`/`os.environ` fuera de `_log.py`, cero
    `print(`, cero `basicConfig`, cero `load_dotenv`, cero `cwd(`.
 6. Los `.bat` se prueban ejecutandolos: `cmd.exe /c ejecutables\build.bat` debe
@@ -136,6 +138,12 @@ espera; commit y push si van siempre. Cada bump: `pyproject` → `uv lock` →
 
 ## 7. Historial
 
+- **0.3.0 (2026-11-02)** — Renombre del paquete `excel`→`excel_utils` (Fase 2):
+  `src/excel/`→`src/excel_utils/`, imports absolutos, `configurar_log`/
+  `purgar_logs` fuera del `__all__` (siguen en `excel_utils._log`), logger
+  `excel`→`excel_utils`, tests en `tests/archivos/`, `LICENSE` MIT, LF +
+  `.gitattributes`. Mapeo: `import excel`→`import excel_utils`,
+  `from excel._log import ...`→`from excel_utils._log import ...`.
 - **0.2.1 (2026-11-02)** — Suite de tests locales (`test_abrir`,
   `test_actualizar_tablas`, `test_consulta_power_query`) con sus `.bat`
   espejo; dos correcciones COM halladas por los tests (`AutoSaveOn` en libro

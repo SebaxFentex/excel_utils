@@ -18,19 +18,29 @@ log = logging.getLogger(__name__)
 
 
 class ClienteExcel:
-    """Abre un libro de Excel y ejecuta operaciones comunes de automatizacion."""
+    """Abre un libro de Excel y ejecuta operaciones comunes de automatizacion.
+
+    Es context manager: al salir del `with` cierra el libro sin guardar
+    (guardar es explicito con `guardar()`); si quedan cambios sin guardar,
+    se avisa con un warning en el log. Con excepcion dentro del bloque,
+    nunca se guarda.
+    """
 
     def __init__(self, ruta_archivo: str | Path | None = None, *, visible: bool = False) -> None:
         self.ruta_archivo = Path(ruta_archivo) if ruta_archivo is not None else None
         self.visible = visible
         self.aplicacion: xw.App | None = None
         self.libro: Any | None = None
+        self._ruta_abierta: Path | None = None
+        self._modificado = False
 
     def __enter__(self) -> ClienteExcel:
         self.abrir()
         return self
 
     def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
+        if exc_type is None and self._modificado:
+            log.warning("El libro se cierra con cambios sin guardar: se descartan.")
         self.cerrar(guardar=False)
 
     def abrir(self, ruta_archivo: str | Path | None = None) -> None:
@@ -40,22 +50,35 @@ class ClienteExcel:
             Usa una instancia dedicada de Excel (no la del usuario) con
             avisos y actualizacion de pantalla apagados, autoguardado
             desactivado y consultas OLEDB en modo sincronico.
+
+        Raises:
+            ValueError: si no hay ruta ni en el argumento ni en el constructor.
+            RuntimeError: si ya hay otro libro abierto (cerralo primero).
         """
+        ruta = Path(ruta_archivo) if ruta_archivo is not None else self.ruta_archivo
+
+        if ruta is None:
+            raise ValueError(
+                "abrir() necesita una ruta: pasala por argumento o en el constructor (ruta_archivo)."
+            )
+
         if self.aplicacion is None:
             self.aplicacion = xw.App(visible=self.visible, add_book=False)
             self.aplicacion.display_alerts = False
             self.aplicacion.screen_updating = False
 
-        ruta = Path(ruta_archivo) if ruta_archivo is not None else self.ruta_archivo
-
-        if ruta is None:
-            return
-
         if self.libro is not None:
-            return
+            if self._ruta_abierta is not None and ruta.resolve() == self._ruta_abierta:
+                return
+            raise RuntimeError(
+                f"Ya hay un libro abierto ({self._ruta_abierta}); "
+                "cerralo con cerrar() antes de abrir otro."
+            )
 
         log.info("Abriendo libro: %s", ruta)
         self.libro = self.aplicacion.books.open(ruta)
+        self.ruta_archivo = ruta
+        self._ruta_abierta = ruta.resolve()
 
         if hasattr(self.libro.api, "AutoSaveOn"):
             self.libro.api.AutoSaveOn = False
@@ -72,6 +95,7 @@ class ClienteExcel:
         """Guarda el libro abierto."""
         libro = self._requerir_libro()
         libro.save()
+        self._modificado = False
         log.info("Libro guardado.")
 
     def cerrar(self, *, guardar: bool = False) -> None:
@@ -81,6 +105,8 @@ class ClienteExcel:
                 self.libro.save()
             self.libro.close()
             self.libro = None
+            self._ruta_abierta = None
+            self._modificado = False
 
     def salir(self, *, guardar: bool = False) -> None:
         """Cierra el libro y termina la instancia de Excel."""
@@ -120,6 +146,7 @@ class ClienteExcel:
                     tabla.QueryTable.Refresh(False)
 
                 libro.app.api.CalculateUntilAsyncQueriesDone()
+                self._modificado = True
                 log.info("Tabla actualizada: %s", nombre_tabla)
                 return
 
@@ -145,6 +172,7 @@ class ClienteExcel:
 
                 tabla_dinamica.RefreshTable()
                 libro.app.api.CalculateUntilAsyncQueriesDone()
+                self._modificado = True
                 log.info("Tabla dinamica actualizada: %s", nombre_tabla_dinamica)
                 return
 
@@ -166,6 +194,7 @@ class ClienteExcel:
             raise ExcepcionConsultaPowerQuery(
                 f"No se pudo actualizar la consulta de Power Query '{nombre_consulta}'."
             ) from exc
+        self._modificado = True
         log.info("Consulta Power Query actualizada: %s", nombre_consulta)
 
     def definir_formula_sql(

@@ -39,12 +39,14 @@ logs/                logs de desarrollo (ignorado por git)
   nombres de tabla/consulta. La unica lectura de entorno es
   `EXCEL_NIVEL_LOG` dentro de `_log.py`, que es desarrollo.
 - `ClienteExcel(ruta_archivo=None, *, visible=False)`: context manager. Al
-  salir del `with` cierra el libro **sin guardar** (D5 pendiente: revisar si el
-  default deberia guardar); guardar es siempre explicito. Orden de metodos:
-  dunder → publicos → privados.
-- `abrir()` sin ruta y sin libro previo no hace nada (retorno silencioso);
-  con libro ya abierto tampoco reabre. La semantica de apertura/cierre esta
-  pendiente de revision (D5): no cambiarla sin pasar por esa decision.
+  salir del `with` cierra el libro **sin guardar** (guardar es siempre
+  explicito, tambien con excepcion: nunca se persiste a medias); si el bloque
+  termino limpio con cambios sin guardar, se avisa con un warning en el log.
+  Orden de metodos: dunder → publicos → privados.
+- `abrir()` exige ruta (argumento o constructor, `ValueError` si falta) y no
+  permite cambiar de libro sin `cerrar()` previo (`RuntimeError`, salvo misma
+  ruta que es idempotente). `cerrar()`/`salir()` son idempotentes: cerrar dos
+  veces no es error.
 - `definir_formula_sql()` escapa con `str.replace` (dobla comillas, convierte
   saltos a `#(lf)`): a proposito sin `re.sub`, cuyo reemplazo interpretaria
   los backslash del valor (una ruta `C:\nuevo` se corromperia).
@@ -90,7 +92,7 @@ logs/                logs de desarrollo (ignorado por git)
 
 ## 4. Logging, codigos de salida y `.env`
 
-- `configurar_log(nivel=None, prefijo="excel-", conservar=30)` configura el
+- `configurar_log(nivel=None, prefijo="excel_utils-", conservar=30)` configura el
   logger "excel" (no el raiz) con archivo y consola en `logs/` (utf-8), purga
   los antiguos y es idempotente: la segunda llamada no agrega manejadores.
   Nivel por parametro > `EXCEL_NIVEL_LOG` > INFO; un valor invalido cae a INFO.
@@ -128,6 +130,11 @@ espera; commit y push si van siempre. Cada bump: `pyproject` → `uv lock` →
 
 ## 7. Historial
 
+- **0.2.0 (2026-11-02)** — D5 (opcion C): `abrir()` falla rapido (`ValueError`
+  sin ruta, `RuntimeError` con otro libro abierto; misma ruta idempotente),
+  `__exit__` avisa con warning si hay cambios sin guardar y nunca guarda con
+  excepcion; flag `_modificado` (lo ponen `actualizar_*`/`definir_*`, lo limpia
+  `guardar()`/`cerrar()`).
 - **0.1.3 (2026-11-02)** — Primera version publicada. Reestructura a norma de
   librerias: layout `src/`, backend `uv_build`, `requires-python>=3.14`,
   `_log.py` + `NullHandler`, `_excepciones.py` con codigos, `README.md` en

@@ -111,13 +111,17 @@ except ExcepcionExcel as exc:
 
 Abre un libro de Excel y ejecuta operaciones comunes de automatizacion.
 `visible=False` trabaja en segundo plano. Es context manager: al salir del
-`with` cierra el libro **sin guardar** (guardar es explicito con `guardar()`).
+`with` cierra el libro **sin guardar** (guardar es explicito con `guardar()`);
+si quedan cambios sin guardar se avisa con un warning en el log, y con
+excepcion dentro del bloque nunca se guarda.
 
 ### `abrir(ruta_archivo=None) -> None`
 
 Abre el libro en una instancia dedicada de Excel con avisos y actualizacion
 de pantalla apagados, autoguardado desactivado y consultas OLEDB sincronicas.
-Sin argumento usa la ruta del constructor.
+Sin argumento usa la ruta del constructor. **Lanza** `ValueError` si no hay
+ruta en ningun lado y `RuntimeError` si ya hay otro libro abierto (misma
+ruta: no hace nada, es idempotente).
 
 ### `guardar() -> None`
 
@@ -160,7 +164,7 @@ Construye `Origen = Sql.Database(servidor, base_datos, [Query=consulta])`
 consulta. **Lanza** `ExcepcionConsultaPowerQuery` (codigo 4) si el libro
 rechaza la formula.
 
-### `configurar_log(nivel=None, prefijo="excel-", conservar=30) -> Logger`
+### `configurar_log(nivel=None, prefijo="excel_utils-", conservar=30) -> Logger`
 
 Configura archivo + consola para el logger `excel` (solo desarrollo).
 Nivel por parametro, `EXCEL_NIVEL_LOG` o `INFO`; idempotente.

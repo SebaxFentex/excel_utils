@@ -9,7 +9,7 @@ Libreria interna PAQUETE (`uv_build`, layout `src/`) para automatizar libros
 de Excel con `xlwings`: apertura segura en instancia propia, actualizacion de
 tablas y tablas dinamicas por nombre, y formulas M de Power Query. Se publica
 en `https://github.com/SebaxFentex/excel_utils` y los proyectos de
-`D:\Tigo\Proyectos` la declaran por ruta relativa editable en su
+`D:\Tigo\Proyectos` la declaran por Git con tag fijo en su
 `[tool.uv.sources]`; no se opera con el Programador de tareas y no pide
 credenciales a ningun humano.
 
@@ -136,6 +136,11 @@ espera; commit y push si van siempre. Cada bump: `pyproject` → `uv lock` →
 
 ## 7. Historial
 
+- **0.2.1 (2026-11-02)** — Suite de tests locales (`test_abrir`,
+  `test_actualizar_tablas`, `test_consulta_power_query`) con sus `.bat`
+  espejo; dos correcciones COM halladas por los tests (`AutoSaveOn` en libro
+  local, `QueryTable` en tabla plana); ruff en verde (`Self`, tipos de
+  `__exit__`, `noqa: BLE001` con razon, format).
 - **0.2.0 (2026-11-02)** — D5 (opcion C): `abrir()` falla rapido (`ValueError`
   sin ruta, `RuntimeError` con otro libro abierto; misma ruta idempotente),
   `__exit__` avisa con warning si hay cambios sin guardar y nunca guarda con

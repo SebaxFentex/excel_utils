@@ -46,20 +46,23 @@ with ClienteExcel("ruta/al/archivo.xlsx", visible=False) as cliente:
 
 ## 2. Como declararla en el proyecto consumidor
 
-En el `pyproject.toml` de `python_<nombre>`, por ruta relativa con
-`editable = true` (nunca `sys.path` ni copiar carpetas). Para un proyecto en
-`Proyectos/<categoria>/<proyecto>/python_<nombre>` son cuatro `../`:
+En el `pyproject.toml` de `python_<nombre>`, por Git con el tag fijo (nunca
+`sys.path` ni copiar carpetas):
 
 ```toml
 [project]
 dependencies = ["excel"]
 
 [tool.uv.sources]
-excel = { path = "../../../../Proyectos/1. PROPIOS/1.5 - Librerias/excel", editable = true }
+excel = { git = "https://github.com/SebaxFentex/excel_utils", tag = "v0.2.1" }
 ```
 
-Ajustar la cantidad de `../` a la profundidad real de `python_<nombre>`,
-y despues `uv lock && uv sync` (el `uv.lock` guarda la misma ruta).
+El repositorio es publico: no hacen falta credenciales. El `tag` fija la version
+del codigo que se instala; para tomar otra hay que cambiarlo y resolver de nuevo.
+
+```bash
+uv lock && uv sync
+```
 
 ## 3. Que necesita el proyecto consumidor
 

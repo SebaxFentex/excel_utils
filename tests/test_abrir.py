@@ -14,19 +14,19 @@ from pathlib import Path
 
 import xlwings as xw
 
-from excel import ClienteExcel, ExcepcionExcel
-from excel._log import configurar_log
+from excel_utils import ClienteExcel, ExcepcionExcel
+from excel_utils._log import configurar_log
 
-log = logging.getLogger("excel.tests")
+log = logging.getLogger("excel_utils.tests")
 
-CARPETA_DESCARGA = Path(__file__).resolve().parent / "archivos" / "descarga"
-RUTA_LIBRO = CARPETA_DESCARGA / "ciclo.xlsx"
+CARPETA_ARCHIVOS = Path(__file__).resolve().parent / "archivos"
+RUTA_LIBRO = CARPETA_ARCHIVOS / "ciclo.xlsx"
 
 
-def _limpiar_descarga() -> None:
-    if CARPETA_DESCARGA.exists():
-        shutil.rmtree(CARPETA_DESCARGA)
-    CARPETA_DESCARGA.mkdir(parents=True, exist_ok=True)
+def _limpiar_archivos() -> None:
+    if CARPETA_ARCHIVOS.exists():
+        shutil.rmtree(CARPETA_ARCHIVOS)
+    CARPETA_ARCHIVOS.mkdir(parents=True, exist_ok=True)
 
 
 def _crear_libro_vacio(ruta: Path) -> None:
@@ -76,7 +76,7 @@ def _probar_ciclo() -> None:
         log.info("OK abrir() la misma ruta es idempotente")
 
         try:
-            cliente.abrir(CARPETA_DESCARGA / "otro.xlsx")
+            cliente.abrir(CARPETA_ARCHIVOS / "otro.xlsx")
         except RuntimeError:
             log.info("OK abrir() otro libro con uno abierto lanza RuntimeError")
         else:
@@ -108,7 +108,7 @@ def _probar_warning_sin_guardar() -> None:
             registros.append((record.levelname, record.getMessage()))
 
     manejador = Manejador()
-    logging.getLogger("excel").addHandler(manejador)
+    logging.getLogger("excel_utils").addHandler(manejador)
     try:
         cliente = ClienteExcel(RUTA_LIBRO)
         try:
@@ -118,7 +118,7 @@ def _probar_warning_sin_guardar() -> None:
         finally:
             cliente.salir()
     finally:
-        logging.getLogger("excel").removeHandler(manejador)
+        logging.getLogger("excel_utils").removeHandler(manejador)
     assert any(n == "WARNING" and "sin guardar" in m for n, m in registros), (
         f"falto el warning: {registros}"
     )
@@ -126,7 +126,7 @@ def _probar_warning_sin_guardar() -> None:
 
     registros.clear()
     manejador2 = Manejador()
-    logging.getLogger("excel").addHandler(manejador2)
+    logging.getLogger("excel_utils").addHandler(manejador2)
     try:
         cliente2 = ClienteExcel(RUTA_LIBRO)
         try:
@@ -136,7 +136,7 @@ def _probar_warning_sin_guardar() -> None:
         finally:
             cliente2.salir()
     finally:
-        logging.getLogger("excel").removeHandler(manejador2)
+        logging.getLogger("excel_utils").removeHandler(manejador2)
     assert not any(n == "WARNING" for n, _ in registros), (
         f"con excepcion no debe avisar: {registros}"
     )
@@ -147,7 +147,7 @@ def main() -> None:
     configurar_log()
     log.info("Test del ciclo de vida del libro")
 
-    _limpiar_descarga()
+    _limpiar_archivos()
     _probar_sin_ruta()
     _probar_ciclo()
     _probar_salir_idempotente()

@@ -8,14 +8,13 @@ La instancia de Excel y las rutas entran por parametro.
 
 import logging
 
-from ._excepciones import (
+from excel_utils._excepciones import (
     ExcepcionConsultaPowerQuery,
     ExcepcionExcel,
     ExcepcionTablaDinamicaNoEncontrada,
     ExcepcionTablaNoEncontrada,
 )
-from ._log import configurar_log, purgar_logs
-from .cliente import ClienteExcel
+from excel_utils.cliente import ClienteExcel
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -25,6 +24,4 @@ __all__ = [
     "ExcepcionExcel",
     "ExcepcionTablaDinamicaNoEncontrada",
     "ExcepcionTablaNoEncontrada",
-    "configurar_log",
-    "purgar_logs",
 ]

@@ -16,19 +16,19 @@ from unittest import mock
 
 import xlwings as xw
 
-from excel import ClienteExcel, ExcepcionConsultaPowerQuery, ExcepcionExcel
-from excel._log import configurar_log
+from excel_utils import ClienteExcel, ExcepcionConsultaPowerQuery, ExcepcionExcel
+from excel_utils._log import configurar_log
 
-log = logging.getLogger("excel.tests")
+log = logging.getLogger("excel_utils.tests")
 
-CARPETA_DESCARGA = Path(__file__).resolve().parent / "archivos" / "descarga"
-RUTA_LIBRO = CARPETA_DESCARGA / "consultas.xlsx"
+CARPETA_ARCHIVOS = Path(__file__).resolve().parent / "archivos"
+RUTA_LIBRO = CARPETA_ARCHIVOS / "consultas.xlsx"
 
 
-def _limpiar_descarga() -> None:
-    if CARPETA_DESCARGA.exists():
-        shutil.rmtree(CARPETA_DESCARGA)
-    CARPETA_DESCARGA.mkdir(parents=True, exist_ok=True)
+def _limpiar_archivos() -> None:
+    if CARPETA_ARCHIVOS.exists():
+        shutil.rmtree(CARPETA_ARCHIVOS)
+    CARPETA_ARCHIVOS.mkdir(parents=True, exist_ok=True)
 
 
 def _crear_libro_vacio(ruta: Path) -> None:
@@ -114,7 +114,7 @@ def main() -> None:
     configurar_log()
     log.info("Test de formulas M de Power Query")
 
-    _limpiar_descarga()
+    _limpiar_archivos()
     _probar_escapado()
     _probar_formula_sql()
     _probar_consulta_inexistente()

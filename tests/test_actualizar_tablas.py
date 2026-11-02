@@ -1,6 +1,6 @@
 """Test local de actualizacion de tablas y tablas dinamicas.
 
-Crea el libro en tests/archivos/descarga/ (se limpia antes de cada corrida),
+Crea el libro en tests/archivos/ (se limpia antes de cada corrida),
 lo actualiza por nombre y verifica los codigos 2 y 3 con nombres inexistentes.
 La tabla dinamica positiva (RefreshTable real) queda pendiente de un libro
 fixture con dinamica: el COM para crearla es fragil entre versiones de Excel.
@@ -16,24 +16,24 @@ from pathlib import Path
 
 import xlwings as xw
 
-from excel import (
+from excel_utils import (
     ClienteExcel,
     ExcepcionExcel,
     ExcepcionTablaDinamicaNoEncontrada,
     ExcepcionTablaNoEncontrada,
 )
-from excel._log import configurar_log
+from excel_utils._log import configurar_log
 
-log = logging.getLogger("excel.tests")
+log = logging.getLogger("excel_utils.tests")
 
-CARPETA_DESCARGA = Path(__file__).resolve().parent / "archivos" / "descarga"
-RUTA_LIBRO = CARPETA_DESCARGA / "tablas.xlsx"
+CARPETA_ARCHIVOS = Path(__file__).resolve().parent / "archivos"
+RUTA_LIBRO = CARPETA_ARCHIVOS / "tablas.xlsx"
 
 
-def _limpiar_descarga() -> None:
-    if CARPETA_DESCARGA.exists():
-        shutil.rmtree(CARPETA_DESCARGA)
-    CARPETA_DESCARGA.mkdir(parents=True, exist_ok=True)
+def _limpiar_archivos() -> None:
+    if CARPETA_ARCHIVOS.exists():
+        shutil.rmtree(CARPETA_ARCHIVOS)
+    CARPETA_ARCHIVOS.mkdir(parents=True, exist_ok=True)
 
 
 def _crear_libro_vacio(ruta: Path) -> None:
@@ -97,7 +97,7 @@ def main() -> None:
     configurar_log()
     log.info("Test de actualizacion de tablas")
 
-    _limpiar_descarga()
+    _limpiar_archivos()
     _crear_libro_con_tabla(RUTA_LIBRO)
     _probar_actualizar_tabla()
 

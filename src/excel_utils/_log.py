@@ -1,7 +1,7 @@
 """Configuracion de log para los entrypoints (tests, ejecutables).
 
 La libreria emite logs via logging.getLogger(__name__); este modulo configura el
-logger "excel" cuando el entrypoint lo llama.
+logger "excel_utils" cuando el entrypoint lo llama.
 """
 
 import logging
@@ -35,12 +35,12 @@ def configurar_log(
     prefijo: str = PREFIJO_LOG_PREDETERMINADO,
     conservar: int = MAX_LOGS_PREDETERMINADO,
 ) -> logging.Logger:
-    """Configura archivo + consola para el logger "excel". Idempotente.
+    """Configura archivo + consola para el logger "excel_utils". Idempotente.
 
     Nivel: parametro > env EXCEL_NIVEL_LOG > NIVEL_LOG_PREDETERMINADO.
     Valor invalido cae a NIVEL_LOG_PREDETERMINADO. Prefijo y retencion llegan
     por parametro (defaults "excel_utils-" y 30).
-    El NullHandler que la libreria agrega en excel/__init__.py no cuenta
+    El NullHandler que la libreria agrega en excel_utils/__init__.py no cuenta
     como configuracion: se ignora a proposito para poder configurarlo aqui.
     """
     resuelto = (
@@ -49,7 +49,7 @@ def configurar_log(
     if resuelto not in logging.getLevelNamesMapping():
         resuelto = NIVEL_LOG_PREDETERMINADO
 
-    logger = logging.getLogger("excel")
+    logger = logging.getLogger("excel_utils")
     if any(not isinstance(h, logging.NullHandler) for h in logger.handlers):
         return logger
 

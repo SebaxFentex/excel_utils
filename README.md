@@ -1,11 +1,11 @@
-# excel
+# excel_utils
 
 Libreria interna para automatizar libros de Excel con `xlwings`: apertura
 segura, actualizacion de tablas y tablas dinamicas por nombre, y actualizacion
 de formulas M de consultas Power Query (incluido el caso `Sql.Database`).
 
 ```python
-from excel import ClienteExcel
+from excel_utils import ClienteExcel
 
 with ClienteExcel("ruta/al/archivo.xlsx", visible=False) as cliente:
     cliente.configurar_libro()
@@ -51,10 +51,10 @@ En el `pyproject.toml` de `python_<nombre>`, por Git con el tag fijo (nunca
 
 ```toml
 [project]
-dependencies = ["excel"]
+dependencies = ["excel_utils"]
 
 [tool.uv.sources]
-excel = { git = "https://github.com/SebaxFentex/excel_utils", tag = "v0.2.1" }
+excel_utils = { git = "https://github.com/SebaxFentex/excel_utils", tag = "v0.3.0" }
 ```
 
 El repositorio es publico: no hacen falta credenciales. El `tag` fija la version
@@ -80,7 +80,7 @@ No hay `.bat` de la libreria que el consumidor deba ejecutar.
 ## 4. Ejemplo minimo
 
 ```python
-from excel import ClienteExcel
+from excel_utils import ClienteExcel
 
 with ClienteExcel("C:/datos/reporte.xlsx") as cliente:
     cliente.actualizar_tabla_por_nombre("Tab_ventas")
@@ -91,7 +91,7 @@ Con consulta SQL sobre Power Query y manejo de errores:
 
 ```python
 import sys
-from excel import ClienteExcel, ExcepcionExcel
+from excel_utils import ClienteExcel, ExcepcionExcel
 
 try:
     with ClienteExcel("C:/datos/reporte.xlsx", visible=False) as cliente:
@@ -167,11 +167,6 @@ Construye `Origen = Sql.Database(servidor, base_datos, [Query=consulta])`
 consulta. **Lanza** `ExcepcionConsultaPowerQuery` (codigo 4) si el libro
 rechaza la formula.
 
-### `configurar_log(nivel=None, prefijo="excel_utils-", conservar=30) -> Logger`
-
-Configura archivo + consola para el logger `excel` (solo desarrollo).
-Nivel por parametro, `EXCEL_NIVEL_LOG` o `INFO`; idempotente.
-
 ## 6. Codigos de salida
 
 | Codigo | Significado | Cuando se usa |
@@ -198,10 +193,10 @@ uv build                 # sin advertencias de build_system.requires
 ```
 
 Los tests son locales (sin credenciales): crean sus libros en
-`tests/archivos/descarga/`, que se limpia en cada corrida.
+`tests/archivos/`, que se limpia en cada corrida.
 
 ```text
-src/excel/
+src/excel_utils/
   __init__.py        NullHandler + API publica
   _log.py            configurar_log() y purgar_logs() para desarrollo
   _excepciones.py    ExcepcionExcel (1), ExcepcionTablaNoEncontrada (2),

@@ -1,10 +1,10 @@
 [project]
-name = "excel"
-version = "0.2.1"
+name = "excel_utils"
+version = "0.3.0"
 description = "Automatizacion de libros de Excel y consultas Power Query con xlwings"
 readme = "README.md"
 authors = [
-    { name = "Sebastián Fuentes", email = "sebastianfuentesab@gmail.com" },
+    { name = "Sebastián Fuentes", email = "sebastianfuentesab@gmail.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [
@@ -13,7 +13,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ipykernel==7.1.0",
+    "ipykernel==7.4.0",
 ]
 
 [build-system]

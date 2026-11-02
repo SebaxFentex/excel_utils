@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any
+from types import TracebackType
+from typing import Any, Self
 
 import xlwings as xw
 
@@ -26,7 +27,9 @@ class ClienteExcel:
     nunca se guarda.
     """
 
-    def __init__(self, ruta_archivo: str | Path | None = None, *, visible: bool = False) -> None:
+    def __init__(
+        self, ruta_archivo: str | Path | None = None, *, visible: bool = False
+    ) -> None:
         self.ruta_archivo = Path(ruta_archivo) if ruta_archivo is not None else None
         self.visible = visible
         self.aplicacion: xw.App | None = None
@@ -34,11 +37,16 @@ class ClienteExcel:
         self._ruta_abierta: Path | None = None
         self._modificado = False
 
-    def __enter__(self) -> ClienteExcel:
+    def __enter__(self) -> Self:
         self.abrir()
         return self
 
-    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         if exc_type is None and self._modificado:
             log.warning("El libro se cierra con cambios sin guardar: se descartan.")
         self.cerrar(guardar=False)
@@ -85,7 +93,7 @@ class ClienteExcel:
         if hasattr(self.libro.api, "AutoSaveOn"):
             try:
                 self.libro.api.AutoSaveOn = False
-            except Exception:
+            except Exception:  # Libro local: asignar AutoSaveOn lanza com_error.  # noqa: BLE001
                 log.debug("No se pudo desactivar AutoSaveOn (libro local).")
 
         if hasattr(self.libro.api, "ConflictResolution"):
@@ -93,7 +101,10 @@ class ClienteExcel:
 
         for i in range(1, self.libro.api.Connections.Count + 1):
             conexion = self.libro.api.Connections.Item(i)
-            if hasattr(conexion, "OLEDBConnection") and conexion.OLEDBConnection is not None:
+            if (
+                hasattr(conexion, "OLEDBConnection")
+                and conexion.OLEDBConnection is not None
+            ):
                 conexion.OLEDBConnection.BackgroundQuery = False
 
     def guardar(self) -> None:
@@ -151,7 +162,7 @@ class ClienteExcel:
                 # en una tabla plana el acceso lanza com_error, no retorna None.
                 try:
                     query_table = tabla.QueryTable
-                except Exception:
+                except Exception:  # Tabla plana: acceder a QueryTable lanza com_error.  # noqa: BLE001
                     query_table = None
                 if query_table is not None:
                     query_table.Refresh(False)
@@ -191,7 +202,9 @@ class ClienteExcel:
             f"No se encontro la tabla dinamica '{nombre_tabla_dinamica}'."
         )
 
-    def actualizar_formula_power_query(self, nombre_consulta: str, formula: str) -> None:
+    def actualizar_formula_power_query(
+        self, nombre_consulta: str, formula: str
+    ) -> None:
         """Actualiza la formula M de una consulta de Power Query por nombre.
 
         Raises:
@@ -243,5 +256,9 @@ class ClienteExcel:
     def _escapar_texto_m(valor: str) -> str:
         """Escapa texto para incrustarlo como literal string dentro de una formula M."""
         escapado = valor.replace('"', '""')
-        escapado = escapado.replace("\r\n", "#(lf)").replace("\n", "#(lf)").replace("\r", "#(lf)")
+        escapado = (
+            escapado.replace("\r\n", "#(lf)")
+            .replace("\n", "#(lf)")
+            .replace("\r", "#(lf)")
+        )
         return escapado

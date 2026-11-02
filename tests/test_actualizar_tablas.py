@@ -76,7 +76,9 @@ def _probar_actualizar_tabla() -> None:
             assert exc.codigo_salida == 2, f"codigo de salida {exc.codigo_salida}"
             log.info("OK tabla inexistente traducida a codigo 2")
         else:
-            raise AssertionError("una tabla inexistente deberia lanzar ExcepcionTablaNoEncontrada")
+            raise AssertionError(
+                "una tabla inexistente deberia lanzar ExcepcionTablaNoEncontrada"
+            )
 
         try:
             cliente.actualizar_tabla_dinamica_por_nombre("Din_inexistente")

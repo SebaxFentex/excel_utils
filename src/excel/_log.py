@@ -43,7 +43,9 @@ def configurar_log(
     El NullHandler que la libreria agrega en excel/__init__.py no cuenta
     como configuracion: se ignora a proposito para poder configurarlo aqui.
     """
-    resuelto = (nivel or os.environ.get("EXCEL_NIVEL_LOG", NIVEL_LOG_PREDETERMINADO)).upper()
+    resuelto = (
+        nivel or os.environ.get("EXCEL_NIVEL_LOG", NIVEL_LOG_PREDETERMINADO)
+    ).upper()
     if resuelto not in logging.getLevelNamesMapping():
         resuelto = NIVEL_LOG_PREDETERMINADO
 

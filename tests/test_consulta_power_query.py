@@ -96,7 +96,9 @@ def _probar_consulta_inexistente() -> None:
         libro.sheets[0]["A1"].value = "x"
         cliente.guardar()
         try:
-            cliente.actualizar_formula_power_query("Consulta_inexistente", "let Origen = 1 in Origen")
+            cliente.actualizar_formula_power_query(
+                "Consulta_inexistente", "let Origen = 1 in Origen"
+            )
         except ExcepcionConsultaPowerQuery as exc:
             assert exc.codigo_salida == 4, f"codigo de salida {exc.codigo_salida}"
             log.info("OK consulta inexistente traducida a codigo 4")

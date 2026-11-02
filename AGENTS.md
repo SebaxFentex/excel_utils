@@ -109,8 +109,11 @@ logs/                logs de desarrollo (ignorado por git)
 1. `uv run python -m compileall -q src/excel`.
 2. `import excel` con el entorno vacio: sin error, `handlers` con el `NullHandler`
    y sin instancia de Excel creada.
-3. `ty check src/excel` en verde (el aviso `reportOptionalMemberAccess` del
-   editor sobre `aplicacion`/`libro` no lo ve el CLI: da `All checks passed!`).
+3. `ty check src/excel tests` y `ruff check src tests` + `ruff format --check`
+   en verde (los `noqa: BLE001` llevan su razon: COM de Excel lanza
+   `com_error` donde un hasattr/None no alcanza; el aviso
+   `reportOptionalMemberAccess` del editor no lo ve el CLI: da
+   `All checks passed!`).
 4. `uv build` sin advertencias de `build_system.requires`; el wheel debe traer
    `excel/__init__.py`.
 5. Greps de guardia: cero `getenv`/`os.environ` fuera de `_log.py`, cero

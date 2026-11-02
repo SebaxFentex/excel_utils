@@ -117,8 +117,11 @@ logs/                logs de desarrollo (ignorado por git)
    `print(`, cero `basicConfig`, cero `load_dotenv`, cero `cwd(`.
 6. Los `.bat` se prueban ejecutandolos: `cmd.exe /c ejecutables\build.bat` debe
    llegar al `pause` final listando `dist\`.
-7. Pendiente: suite `tests/` (sin tests por ahora). Cuando exista, cada test
-   es `test_<verbo>.py` ejecutable con `main()` y su `.bat` espejo.
+7. Tres tests (`test_abrir`, `test_actualizar_tablas`,
+   `test_consulta_power_query`): locales, sin credenciales, cada uno con su
+   `.bat` espejo. La tabla dinamica positiva (RefreshTable real) queda
+   pendiente de un libro fixture con dinamica: el COM para crearla es fragil
+   entre versiones de Excel.
 
 ## 6. Versionado
 

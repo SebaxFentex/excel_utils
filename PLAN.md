@@ -12,7 +12,8 @@ Repo local init 2026-11-02 (rama `main`). Remoto pendiente (D3).
 - **D3**: crear remoto `https://github.com/SebaxFentex/excel_utils`.
 - **D4**: publicar la version actual `0.1.3` (tag `v0.1.3`, sin bump).
 - **D5**: aplicada opcion C (2026-11-02) en version `0.2.0`.
-- **Sin tests por ahora**: `tests/` y `ejecutables/tests/` quedan pendientes.
+- **Tests**: `tests/` + `ejecutables/tests/` creados (2026-11-02, 3 tests
+  locales); tabla dinamica positiva pendiente de fixture.
 
 ## Fases
 

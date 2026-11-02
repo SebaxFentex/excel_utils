@@ -80,8 +80,13 @@ class ClienteExcel:
         self.ruta_archivo = ruta
         self._ruta_abierta = ruta.resolve()
 
+        # AutoSaveOn solo existe en libros en la nube (OneDrive/SharePoint):
+        # en un libro local el hasattr pasa pero asignar lanza com_error.
         if hasattr(self.libro.api, "AutoSaveOn"):
-            self.libro.api.AutoSaveOn = False
+            try:
+                self.libro.api.AutoSaveOn = False
+            except Exception:
+                log.debug("No se pudo desactivar AutoSaveOn (libro local).")
 
         if hasattr(self.libro.api, "ConflictResolution"):
             self.libro.api.ConflictResolution = 2
@@ -142,8 +147,14 @@ class ClienteExcel:
                 if tabla.Name != nombre_tabla:
                     continue
 
-                if hasattr(tabla, "QueryTable") and tabla.QueryTable is not None:
-                    tabla.QueryTable.Refresh(False)
+                # QueryTable solo existe en tablas vinculadas a datos externos:
+                # en una tabla plana el acceso lanza com_error, no retorna None.
+                try:
+                    query_table = tabla.QueryTable
+                except Exception:
+                    query_table = None
+                if query_table is not None:
+                    query_table.Refresh(False)
 
                 libro.app.api.CalculateUntilAsyncQueriesDone()
                 self._modificado = True

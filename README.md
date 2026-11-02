@@ -188,12 +188,14 @@ incorrecto y `ValueError` si el contenido esta vacio.
 
 ```bash
 uv sync                  # crea .venv con las dependencias del lock
-uv run python -m compileall -q src/excel
+uv run python tests/test_abrir.py
+uv run python tests/test_actualizar_tablas.py
+uv run python tests/test_consulta_power_query.py
 uv build                 # sin advertencias de build_system.requires
 ```
 
-Sin suite de tests por ahora (pendiente): los tests viviran en `tests/`,
-el unico lugar del ecosistema donde se escriben.
+Los tests son locales (sin credenciales): crean sus libros en
+`tests/archivos/descarga/`, que se limpia en cada corrida.
 
 ```text
 src/excel/
@@ -203,7 +205,8 @@ src/excel/
                      ExcepcionTablaDinamicaNoEncontrada (3),
                      ExcepcionConsultaPowerQuery (4)
   cliente.py         ClienteExcel
-ejecutables/         build.bat, abrir_vscode.bat
+ejecutables/         build.bat, abrir_vscode.bat y tests/ (un .bat por test)
+tests/               los tres tests; el unico lugar del ecosistema con tests
 logs/                logs de desarrollo (ignorado por git)
 ```
 

@@ -1,11 +1,14 @@
 [project]
 name = "excel"
 version = "0.1.3"
-description = "Libreria para automatizar libros de Excel y consultas Power Query con xlwings"
+description = "Automatizacion de libros de Excel y consultas Power Query con xlwings"
 readme = "README.md"
-requires-python = ">=3.13"
+authors = [
+    { name = "Sebastián Fuentes", email = "sebastianfuentesab@gmail.com" },
+]
+requires-python = ">=3.14"
 dependencies = [
-	"xlwings>=0.30.0",
+    "xlwings==0.37.8",
 ]
 
 [dependency-groups]
@@ -14,8 +17,5 @@ dev = [
 ]
 
 [build-system]
-requires = ["hatchling>=1.24.0"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["excel"]
+requires = ["uv_build>=0.13.0,<1.0"]
+build-backend = "uv_build"

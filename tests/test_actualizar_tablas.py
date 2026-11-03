@@ -11,10 +11,12 @@ Uso: uv run python tests/test_actualizar_tablas.py
 from __future__ import annotations
 
 import logging
+import os
 import shutil
 from pathlib import Path
 
 import xlwings as xw
+from log_utils import configurar_log
 
 from excel_utils import (
     ClienteExcel,
@@ -22,7 +24,6 @@ from excel_utils import (
     ExcepcionTablaDinamicaNoEncontrada,
     ExcepcionTablaNoEncontrada,
 )
-from excel_utils._log import configurar_log
 
 log = logging.getLogger("excel_utils.tests")
 
@@ -94,7 +95,13 @@ def _probar_actualizar_tabla() -> None:
 
 
 def main() -> None:
-    configurar_log()
+    configurar_log(
+        nombre="excel_utils",
+        carpeta_logs=Path(__file__).resolve().parent.parent / "logs",
+        nivel_archivo=os.environ.get("EXCEL_NIVEL_LOG"),
+        nivel_consola=os.environ.get("EXCEL_NIVEL_LOG"),
+        prefijo="excel_utils-",
+    )
     log.info("Test de actualizacion de tablas")
 
     _limpiar_archivos()

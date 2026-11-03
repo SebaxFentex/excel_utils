@@ -21,7 +21,6 @@ Stack: Python 3.14, `uv`, `xlwings==0.37.8`.
 ```text
 src/excel_utils/
   __init__.py        NullHandler + API publica (sin re-exports de modulos internos)
-  _log.py            configurar_log() + purgar_logs() — solo para desarrollo
   _excepciones.py    ExcepcionExcel (1), ExcepcionTablaNoEncontrada (2),
                      ExcepcionTablaDinamicaNoEncontrada (3),
                      ExcepcionConsultaPowerQuery (4)
@@ -38,8 +37,8 @@ logs/                logs de desarrollo (ignorado por git)
 
 - **La libreria no lee entorno.** `import excel_utils` no exige ninguna variable y no
   abre Excel. Todo entra por parametro: la ruta del libro, `visible` y los
-  nombres de tabla/consulta. La unica lectura de entorno es
-  `EXCEL_NIVEL_LOG` dentro de `_log.py`, que es desarrollo.
+  nombres de tabla/consulta. Los tests leen `EXCEL_NIVEL_LOG` y lo pasan a
+  `log_utils.configurar_log`.
 - `ClienteExcel(ruta_archivo=None, *, visible=False)`: context manager. Al
   salir del `with` cierra el libro **sin guardar** (guardar es siempre
   explicito, tambien con excepcion: nunca se persiste a medias); si el bloque
@@ -57,9 +56,10 @@ logs/                logs de desarrollo (ignorado por git)
 
 ## 3. Reglas inviolables
 
-1. **Cero lecturas de entorno en la libreria, salvo `_log.py`.**
-   `cliente.py` y `_excepciones.py` no importan `os`. Un valor que cambia por
-   maquina se pasa como parametro.
+1. **Cero lecturas de entorno en la libreria.** Ningun modulo de `src/`
+   importa `os`: los tests leen `EXCEL_NIVEL_LOG` y lo pasan como parametro a
+   `log_utils.configurar_log`. Un valor que cambia por maquina se pasa como
+   parametro.
 2. **Codigos por donde ocurrio, no por el driver.** Tabla inexistente (2) y
    tabla dinamica inexistente (3) son estados distintos del libro: no se
    fusionan en un solo "no encontrado". Formula rechazada (4) es error del
@@ -68,7 +68,7 @@ logs/                logs de desarrollo (ignorado por git)
    en cada modulo y `NullHandler` en el paquete; `configurar_log()` solo se
    llama desde desarrollo. Prohibido `basicConfig()` y prohibido que un modulo
    que emite agregue manejadores: el unico que agrega es
-   `_log.configurar_log()`, y lo hace sobre el logger "excel_utils", nunca sobre el
+   `log_utils.configurar_log()`, y lo hace sobre el logger "excel_utils", nunca sobre el
    raiz del consumidor.
 4. **Sin `print()`.** El unico destino de las trazas es `log`.
 5. **Sin efectos al importar.** Prohibido abrir Excel a nivel de modulo y
@@ -94,11 +94,11 @@ logs/                logs de desarrollo (ignorado por git)
 
 ## 4. Logging, codigos de salida y `.env`
 
-- `configurar_log(nivel=None, prefijo="excel_utils-", conservar=30)` configura el
-  logger "excel_utils" (no el raiz) con archivo y consola en `logs/` (utf-8), purga
-  los antiguos y es idempotente: la segunda llamada no agrega manejadores.
-  Nivel por parametro > `EXCEL_NIVEL_LOG` > INFO; un valor invalido cae a INFO.
-  Devuelve el `Logger` configurado.
+- Los tests llaman `log_utils.configurar_log(nombre="excel_utils",
+  carpeta_logs=<repo>/logs, nivel_archivo/nivel_consola=os.environ.get("EXCEL_NIVEL_LOG"),
+  prefijo="excel_utils-")`: archivo en DEBUG y consola en INFO, cada uno con
+  su formato, purga los antiguos e idempotente. Devuelve el `Logger`
+  configurado.
 - Codigos: `0` correcto · `1` fallo generico · `2` tabla · `3` tabla dinamica ·
   `4` Power Query. El consumidor hace `sys.exit(exc.codigo_salida)`.
 - Sin `.env` (D2: tests locales sin configuracion externa). Si un test futuro
@@ -118,7 +118,7 @@ logs/                logs de desarrollo (ignorado por git)
    `All checks passed!`).
 4. `uv build` sin advertencias de `build_system.requires`; el wheel debe traer
    `excel_utils/__init__.py`.
-5. Greps de guardia: cero `getenv`/`os.environ` fuera de `_log.py`, cero
+5. Greps de guardia: cero `getenv`/`os.environ` en `src/`, cero
    `print(`, cero `basicConfig`, cero `load_dotenv`, cero `cwd(`.
 6. Los `.bat` se prueban ejecutandolos: `cmd.exe /c ejecutables\build.bat` debe
    llegar al `pause` final listando `dist\`.
@@ -138,6 +138,9 @@ espera; commit y push si van siempre. Cada bump: `pyproject` → `uv lock` →
 
 ## 7. Historial
 
+- **0.4.0 (2026-11-02)** — Logging via `log_utils` (v0.1.0, dependencia por
+  Git con tag): se elimina `src/excel_utils/_log.py`; los tests llaman
+  `log_utils.configurar_log` con archivo en DEBUG y consola en INFO.
 - **0.3.0 (2026-11-02)** — Renombre del paquete `excel`→`excel_utils` (Fase 2):
   `src/excel/`→`src/excel_utils/`, imports absolutos, `configurar_log`/
   `purgar_logs` fuera del `__all__` (siguen en `excel_utils._log`), logger

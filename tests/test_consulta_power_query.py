@@ -10,14 +10,15 @@ Uso: uv run python tests/test_consulta_power_query.py
 from __future__ import annotations
 
 import logging
+import os
 import shutil
 from pathlib import Path
 from unittest import mock
 
 import xlwings as xw
+from log_utils import configurar_log
 
 from excel_utils import ClienteExcel, ExcepcionConsultaPowerQuery, ExcepcionExcel
-from excel_utils._log import configurar_log
 
 log = logging.getLogger("excel_utils.tests")
 
@@ -111,7 +112,13 @@ def _probar_consulta_inexistente() -> None:
 
 
 def main() -> None:
-    configurar_log()
+    configurar_log(
+        nombre="excel_utils",
+        carpeta_logs=Path(__file__).resolve().parent.parent / "logs",
+        nivel_archivo=os.environ.get("EXCEL_NIVEL_LOG"),
+        nivel_consola=os.environ.get("EXCEL_NIVEL_LOG"),
+        prefijo="excel_utils-",
+    )
     log.info("Test de formulas M de Power Query")
 
     _limpiar_archivos()

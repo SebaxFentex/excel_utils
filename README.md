@@ -54,7 +54,7 @@ En el `pyproject.toml` de `python_<nombre>`, por Git con el tag fijo (nunca
 dependencies = ["excel_utils"]
 
 [tool.uv.sources]
-excel_utils = { git = "https://github.com/SebaxFentex/excel_utils", tag = "v0.3.0" }
+excel_utils = { git = "https://github.com/SebaxFentex/excel_utils", tag = "v0.4.0" }
 ```
 
 El repositorio es publico: no hacen falta credenciales. El `tag` fija la version
@@ -198,7 +198,6 @@ Los tests son locales (sin credenciales): crean sus libros en
 ```text
 src/excel_utils/
   __init__.py        NullHandler + API publica
-  _log.py            configurar_log() y purgar_logs() para desarrollo
   _excepciones.py    ExcepcionExcel (1), ExcepcionTablaNoEncontrada (2),
                      ExcepcionTablaDinamicaNoEncontrada (3),
                      ExcepcionConsultaPowerQuery (4)

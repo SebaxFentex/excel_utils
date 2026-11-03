@@ -1,6 +1,6 @@
 [project]
 name = "excel_utils"
-version = "0.3.0"
+version = "0.4.0"
 description = "Automatizacion de libros de Excel y consultas Power Query con xlwings"
 readme = "README.md"
 authors = [
@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "xlwings==0.37.8",
+    "log_utils",
 ]
 
 [dependency-groups]
@@ -19,3 +20,6 @@ dev = [
 [build-system]
 requires = ["uv_build>=0.13.0,<1.0"]
 build-backend = "uv_build"
+
+[tool.uv.sources]
+log_utils = { git = "https://github.com/SebaxFentex/log_utils", tag = "v0.1.0" }

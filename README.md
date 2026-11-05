@@ -202,7 +202,7 @@ src/excel_utils/
                      ExcepcionTablaDinamicaNoEncontrada (3),
                      ExcepcionConsultaPowerQuery (4)
   cliente.py         ClienteExcel
-ejecutables/         build.bat, abrir_vscode.bat y tests/ (un .bat por test)
+Ejecutables/         build.bat, abrir_vscode.bat y tests/ (un .bat por test)
 tests/               los tres tests; el unico lugar del ecosistema con tests
 logs/                logs de desarrollo (ignorado por git)
 ```

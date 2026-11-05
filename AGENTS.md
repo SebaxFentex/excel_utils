@@ -25,7 +25,7 @@ src/excel_utils/
                      ExcepcionTablaDinamicaNoEncontrada (3),
                      ExcepcionConsultaPowerQuery (4)
   cliente.py         ClienteExcel
-ejecutables/
+Ejecutables/
   build.bat          uv build y lista dist/
   abrir_vscode.bat   abre la raiz de la libreria
   tests/             un .bat por test (espejo de tests/)
@@ -77,7 +77,7 @@ logs/                logs de desarrollo (ignorado por git)
 6. **Los datos de entrada malformados se dejan nativos.** `TypeError` si el
    valor no es texto y `ValueError` si es texto pero llega vacio o solo con
    espacios. Nunca se envuelven en `ExcepcionExcel`.
-7. **`.bat` de proceso en `ejecutables/` invocando `uv run`.**
+7. **`.bat` de proceso en `Ejecutables/` invocando `uv run`.**
    `abrir_vscode.bat` es utilitario: no lleva `uv run`.
 8. **Nada especulativo.** Sin abstracciones de un solo uso ni parametros de
    "por si acaso". Lo muerto se borra: queda en git si se necesita.
@@ -120,7 +120,7 @@ logs/                logs de desarrollo (ignorado por git)
    `excel_utils/__init__.py`.
 5. Greps de guardia: cero `getenv`/`os.environ` en `src/`, cero
    `print(`, cero `basicConfig`, cero `load_dotenv`, cero `cwd(`.
-6. Los `.bat` se prueban ejecutandolos: `cmd.exe /c ejecutables\build.bat` debe
+6. Los `.bat` se prueban ejecutandolos: `cmd.exe /c Ejecutables\build.bat` debe
    llegar al `pause` final listando `dist\`.
 7. Tres tests (`test_abrir`, `test_actualizar_tablas`,
    `test_consulta_power_query`): locales, sin credenciales, cada uno con su
